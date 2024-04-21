@@ -1,0 +1,42 @@
+---
+- name: Setup New Relic Infrastructure Agent
+  hosts: your_host_group
+  become: yes
+  tasks:
+    - name: Set New Relic license key
+      lineinfile:
+        dest: /etc/newrelic-infra.yml
+        line: "license_key: YOUR_LICENSE_KEY"
+      when: ansible_architecture == 'x86_64'  # Perform only on x86_64 architecture
+
+    - name: Add New Relic repository file (x86_64)
+      get_url:
+        url: "https://download.newrelic.com/infrastructure_agent/linux/yum/amazonlinux/2023/x86_64/newrelic-infra.repo"
+        dest: /etc/yum.repos.d/newrelic-infra.repo
+      when: ansible_architecture == 'x86_64'  # Perform only on x86_64 architecture
+
+    - name: Add New Relic repository file (aarch64)
+      get_url:
+        url: "https://download.newrelic.com/infrastructure_agent/linux/yum/amazonlinux/2023/aarch64/newrelic-infra.repo"
+        dest: /etc/yum.repos.d/newrelic-infra.repo
+      when: ansible_architecture == 'aarch64'  # Perform only on aarch64 architecture
+
+    - name: Update package cache
+      yum:
+        name: ''
+        update_cache: yes
+        disable_repos: '*'
+        enablerepo: 'newrelic-infra'
+      become: yes
+
+    - name: Install New Relic Infrastructure Agent
+      yum:
+        name: newrelic-infra
+        state: present
+      become: yes
+
+    - name: Install libcap package
+      yum:
+        name: libcap
+        state: present
+      become: yes
