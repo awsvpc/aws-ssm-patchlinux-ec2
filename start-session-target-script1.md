@@ -1,7 +1,9 @@
-
-Execute command to download playbook on the EC2 instance
+<pre>
+    Execute command to download playbook on the EC2 instance
 def downloadCmd = "aws ssm send-command --document-name AWS-RunShellScript --targets Key=instanceids,Values=${instanceId} --parameters 'commands=aws s3 cp s3://your-bucket-name/${playbookName} /tmp/${playbookName}' --region ${region}"
 sh downloadCmd
+</pre>
+
 
 pipeline {
     agent any
